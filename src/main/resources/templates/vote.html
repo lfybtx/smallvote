@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>投票页面</title>
+    <!-- 导入 Element UI 样式 -->
+    <link rel="stylesheet" href="https://unpkg.com/element-ui/lib/theme-chalk/index.css">
+    <style>
+
+        .table-container {
+            width: 100%;
+            height: 100%; /* 高度100% */
+        }
+
+        .el-table {
+            width: 100%;
+            max-height: 100%; /* 最大高度为100% */
+            overflow: auto; /* 允许表格内容滚动 */
+            table-layout: fixed; /* 确保列宽固定 */
+        }
+
+        .avatar-img {
+            max-width: 100%; /* 最大宽度为单元格的宽度 */
+            max-height: 100%; /* 最大高度为单元格的高度 */
+            object-fit: cover; /* 确保图片裁剪并填满单元格 */
+            border-radius: 50%; /* 圆形头像 */
+        }
+
+        .logout-button {
+            position: fixed;
+            right: 20px;
+            bottom: 20px;
+            z-index: 1000;
+        }
+    </style>
+</head>
+<body>
+<div id="app">
+    <div class="table-container">
+        <el-table :data="singgerList" border style="width: 100%; height: 100%">
+            <el-table-column label="歌手头像" align="center">
+                <template slot-scope="scope">
+                    <img :src="scope.row.imgUrl" class="avatar-img" alt="头像">
+                </template>
+            </el-table-column>
+            <el-table-column prop="name" label="歌手名" align="center">
+            </el-table-column>
+            <el-table-column prop="votes" label="歌手当前人气值" align="center">
+            </el-table-column>
+            <el-table-column label="操作" align="center">
+                <template slot-scope="scope">
+                    <div class="button-group">
+                        <el-button @click="editRow(scope.row)" type="primary" size="small">喜欢票</el-button>
+                        <el-button @click="deleteRow(scope.row)" type="danger" size="small">讨厌票</el-button>
+                    </div>
+                </template>
+            </el-table-column>
+        </el-table>
+    </div>
+    <!-- 固定定位的退出登录按钮 -->
+    <el-button class="logout-button" type="warning" @click="logout">退出登录</el-button>
+</div>
+
+<!-- 导入 Vue.js -->
+<script src="https://cdn.jsdelivr.net/npm/vue@2.6.14/dist/vue.min.js"></script>
+<!-- 导入 Element UI -->
+<script src="https://unpkg.com/element-ui/lib/index.js"></script>
+<!-- 导入 Axios -->
+<script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+
+<script>
+    new Vue({
+        el: '#app',
+
+        data() {
+            return {
+                singgerList: [] // 确保数据中包含正确的图片 URL
+            }
+        },
+        created() {
+            this.checkLogin();
+            this.getSinggerList(); // 在组件创建时调用方法
+        },
+        methods: {
+            getSinggerList() {
+                axios.get('/vote/list')
+                    .then(response => {
+                        this.singgerList = response.data.data; // 确保数据格式正确
+                    })
+                    .catch(error => {
+                        console.error('获取数据失败', error);
+                    });
+            },
+            editRow(row) {
+                console.log('编辑', row);
+            },
+            deleteRow(row) {
+                console.log('删除', row);
+            },
+            logout() {
+                axios.get('/user/logout').then(response => {
+                    if(response.data.code===200){
+                        sessionStorage.removeItem('username');
+                        window.location.href='/index.html'
+
+                    }else
+                    {
+                        console.error('获取数据失败', error);
+                    }
+                })
+                console.log('退出登录');
+                // 在此处添加你的退出登录逻辑，例如重定向到登录页面
+                // window.location.href = '/login'; // 示例重定向
+            },
+            checkLogin() {
+                const username = sessionStorage.getItem('username');
+                if (!username) {
+                    window.location.href = '/index.html';
+                }
+            }
+        }
+    });
+</script>
+</body>
+</html>

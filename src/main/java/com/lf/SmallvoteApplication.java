@@ -1,4 +1,4 @@
-package com.lf.smallvote;
+package com.lf;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;

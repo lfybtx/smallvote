@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>登录页面</title>
+    <!-- 导入 Element UI 样式 -->
+    <link rel="stylesheet" href="https://unpkg.com/element-ui/lib/theme-chalk/index.css">
+    <style>
+        body, html {
+            height: 100%;
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background-image: url("https://lf-vote.oss-cn-beijing.aliyuncs.com/background/background.jpg"); /* 背景图 */
+            background-size: cover;
+            background-position: center;
+        }
+        #app {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            width: 100vw; /* 使用视口宽度 */
+            height: 100vh; /* 使用视口高度 */
+        }
+        .login-card {
+            width: 400px;
+            height: 300px; /* 确保设置一个合适的高度 */
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            background: #fff; /* 登录框背景色 */
+            display: flex;
+            flex-direction: column;
+            justify-content: center; /* 确保内容垂直居中 */
+        }
+    </style>
+</head>
+<body>
+<div id="app">
+    <div class="login-card">
+        <el-container>
+            <el-header style="text-align: center; margin-bottom: 20px;">
+                <h1>登录</h1>
+            </el-header>
+            <el-main>
+                <el-form :model="loginForm" ref="loginForm" :rules="rules" label-width="80px">
+                    <el-form-item label="用户名" prop="username">
+                        <el-input v-model="loginForm.username"></el-input>
+                    </el-form-item>
+                    <el-form-item label="密码" prop="password">
+                        <el-input type="password" v-model="loginForm.password" @keyup.enter.native="handleLogin"></el-input>
+                    </el-form-item>
+                        <el-form-item>
+                            <el-button type="primary" @click="handleLogin">登录</el-button>
+                        </el-form-item>
+                </el-form>
+            </el-main>
+        </el-container>
+    </div>
+</div>
+
+<!-- 导入 Vue.js -->
+<script src="https://cdn.jsdelivr.net/npm/vue@2.6.14/dist/vue.min.js"></script>
+<!-- 导入 Element UI -->
+<script src="https://unpkg.com/element-ui/lib/index.js"></script>
+<!-- 导入 Axios -->
+<script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+
+<script>
+    new Vue({
+        el: '#app',
+        data() {
+            return {
+                loginForm: {
+                    username: '',
+                    password: ''
+                },
+                rules: {
+                    username: [
+                        { required: true, message: '请输入用户名', trigger: 'blur' }
+                    ],
+                    password: [
+                        { required: true, message: '请输入密码', trigger: 'blur' }
+                    ]
+                }
+            }
+        },
+        created() {
+            this.checkLogin();
+        },
+        methods: {
+            handleLogin() {
+                this.$refs.loginForm.validate((valid) => {
+                    if (valid) {
+                        axios.post('/user/login', this.loginForm)
+                            .then(response => {
+                                if(response.data.code === 200){
+                                    this.$message({
+                                        message: "登录成功",
+                                        type: 'success'
+                                    });
+                                    // 将用户名存储在 sessionStorage 中
+                                    sessionStorage.setItem('username', this.loginForm.username);
+                                    window.location.href = '/vote.html';
+                                } else {
+                                    this.$message({
+                                        message: "账号或密码错误",
+                                        type: 'error'
+                                    });
+                                }
+                            })
+                            .catch(error => {
+                                console.error('登录失败', error);
+                            });
+                    } else {
+                        console.log('表单验证失败!!');
+                        return false;
+                    }
+                });
+            },
+            checkLogin() {
+                const username = sessionStorage.getItem('username');
+                if (username) {
+                    window.location.href = '/vote.html';
+                }
+            }
+        }
+    });
+</script>
+</body>
+</html>
