@@ -4,8 +4,11 @@ import com.baomidou.mybatisplus.annotation.TableName;
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
 import java.io.Serializable;
+
+import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
 
 /**
  * <p>
@@ -16,9 +19,18 @@ import lombok.EqualsAndHashCode;
  * @since 2024-08-04
  */
 @Data
-@EqualsAndHashCode(callSuper = false)
+
 @TableName("user")
 public class User implements Serializable {
+    public User() {
+    }
+
+    public User(Long id, String username, String password, Integer votes) {
+        this.id = id;
+        this.username = username;
+        this.password = password;
+        this.votes = votes;
+    }
 
     private static final long serialVersionUID = 1L;
 

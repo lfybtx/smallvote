@@ -51,8 +51,8 @@
             <el-table-column label="操作" align="center">
                 <template slot-scope="scope">
                     <div class="button-group">
-                        <el-button @click="editRow(scope.row)" type="primary" size="small">喜欢票</el-button>
-                        <el-button @click="deleteRow(scope.row)" type="danger" size="small">讨厌票</el-button>
+                        <el-button @click="addVotes(scope.row)" type="primary" size="small">喜欢票</el-button>
+                        <el-button @click="subVotes(scope.row)" type="danger" size="small">讨厌票</el-button>
                     </div>
                 </template>
             </el-table-column>
@@ -79,35 +79,97 @@
             }
         },
         created() {
-            this.checkLogin();
+            setInterval(this.checkLogin, 5000);
             this.getSinggerList(); // 在组件创建时调用方法
+            setInterval(this.getSinggerList, 5000); // 每5秒调用一次 getSinggerList 方法
         },
         methods: {
+            sortedSinggerList(list) {
+                return list.slice().sort((a, b) => {
+                    if (b.votes === a.votes) {
+                        return a.id - b.id; // votes相同时按id从小到大排序
+                    }
+                    return b.votes - a.votes; // 按votes从大到小排序
+                });
+            },
             getSinggerList() {
                 axios.get('/vote/list')
                     .then(response => {
-                        this.singgerList = response.data.data; // 确保数据格式正确
+                        this.singgerList = this.sortedSinggerList(response.data.data); // 确保数据格式正确
                     })
                     .catch(error => {
                         console.error('获取数据失败', error);
                     });
             },
-            editRow(row) {
-                console.log('编辑', row);
+            addVotes(row) {
+                const username = sessionStorage.getItem('username'); // 转换为数字
+                const voteId = Number(row.id); // 确保是数字
+                console.log('发送请求的数据:', {username, voteId});
+                axios.put('/vote/addVotes', {
+                    username: username,
+                    voteId: voteId
+                }, {
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                })
+                    .then(response => {
+                        if (response.data.code === 200) {
+                            this.$message.success('喜欢票添加成功');
+                            this.getSinggerList(); // 更新列表
+                            this.checkLogin();
+                        } else {
+                            this.$message.error('添加喜欢票失败');
+                        }
+                    })
+                    .catch(error => {
+                        console.error('添加喜欢票失败', error);
+                        this.$message.error('网络错误');
+                    });
             },
-            deleteRow(row) {
-                console.log('删除', row);
+            subVotes(row) {
+                const username = sessionStorage.getItem('username'); // 转换为数字
+                const voteId = Number(row.id); // 确保是数字
+
+                axios.put('/vote/subVotes', {
+                    username: username,
+                    voteId: voteId
+                }, {
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                })
+                    .then(response => {
+                        if (response.data.code === 200) {
+                            this.$message.success('讨厌票添加成功');
+                            this.getSinggerList(); // 更新列表
+                        } else {
+                            this.$message.error('添加讨厌票失败');
+                        }
+                    })
+                    .catch(error => {
+                        console.error('添加讨厌票失败', error);
+                        this.$message.error('网络错误');
+                    });
             },
             logout() {
-                axios.get('/user/logout').then(response => {
-                    if(response.data.code===200){
-                        sessionStorage.removeItem('username');
-                        window.location.href='/index.html'
-
-                    }else
-                    {
-                        console.error('获取数据失败', error);
+                const username = sessionStorage.getItem('username')
+                console.log("222222222222222222")
+                console.log(username)
+                axios.get('/user/logout', {
+                    params: {
+                        username: username
                     }
+                }).then(response => {
+                    if (response.data.code === 200) {
+                        sessionStorage.removeItem('username');
+                        window.location.href = '/index.html'
+
+                    } else {
+                        console.error('退出失败', error);
+                    }
+                }).catch(error => {
+                    console.error('111111111111111', error);
                 })
                 console.log('退出登录');
                 // 在此处添加你的退出登录逻辑，例如重定向到登录页面
@@ -115,10 +177,32 @@
             },
             checkLogin() {
                 const username = sessionStorage.getItem('username');
-                if (!username) {
-                    window.location.href = '/index.html';
+                console.log(username)
+                if(!username){
+                    window.location.href = "/index.html"
                 }
-            }
+                axios.get('/user/checkLogin', {
+                    params: {
+                        username: username
+                    }
+                })
+                    // .then(response => {
+                //     if (response.data.code === 200) {
+                //     } else {
+                //         this.$confirm('登录信息已过期，请重新登录', '提示', {
+                //             confirmButtonText: '确定',
+                //             cancelButtonText: '取消',
+                //             type: 'warning'
+                //         }).then(() => {
+                //             sessionStorage.removeItem('username');
+                //             window.location.href = "/index.html"
+                //         })
+                //     }
+                // }).catch(error => {
+                //     console.error('111111111111111', error);
+                // })
+
+            },
         }
     });
 </script>

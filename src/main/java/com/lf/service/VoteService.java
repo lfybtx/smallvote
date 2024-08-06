@@ -2,6 +2,9 @@ package com.lf.service;
 
 import com.lf.entity.Vote;
 import com.baomidou.mybatisplus.extension.service.IService;
+import org.springframework.beans.factory.annotation.Autowired;
+
+import java.util.List;
 
 /**
  * <p>
@@ -13,4 +16,10 @@ import com.baomidou.mybatisplus.extension.service.IService;
  */
 public interface VoteService extends IService<Vote> {
 
+
+    List<Vote> selectAll();
+
+    boolean addVotes(String username, Long voteId);
+
+    boolean subVotes(String username, Long voteId);
 }
