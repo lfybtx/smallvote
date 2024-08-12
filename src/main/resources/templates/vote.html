@@ -143,6 +143,7 @@
                         if (response.data.code === 200) {
                             this.$message.success('讨厌票添加成功');
                             this.getSinggerList(); // 更新列表
+                            this.checkLogin();
                         } else {
                             this.$message.error('添加讨厌票失败');
                         }

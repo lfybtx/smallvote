@@ -1,0 +1,29 @@
+server:
+  port: 8001
+
+
+
+canal:
+  hostname: 127.0.0.1
+  port: 11111
+  destination: example
+  username: ""
+  password: ""
+  filter:
+    - vote.user
+    - vote.vote
+spring:
+  application:
+    name: canal
+  rabbitmq:
+    host: localhost
+    port: 5672
+    username: guest
+    password: guest
+    virtual-host: /
+  datasource:
+    druid:
+      driver-class-name: com.mysql.cj.jdbc.Driver
+      url: jdbc:mysql://localhost:3306/vote?serverTimezone=Asia/Shanghai&useUnicode=true&characterEncoding=utf-8&zeroDateTimeBehavior=convertToNull&useSSL=false&allowPublicKeyRetrieval=true
+      username: root
+      password: 123456
