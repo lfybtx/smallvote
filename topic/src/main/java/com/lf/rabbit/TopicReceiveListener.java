@@ -41,7 +41,7 @@ public class TopicReceiveListener {
         database.getRowDate().forEach(row -> log.info(row.toString()));
     }
 
-    @RabbitListener(queues = QUEUE_TOPIC2)
+    @RabbitListener(queues = QUEUE_TOPIC2,concurrency = "10")
     @RabbitHandler
     public void receiveMsg2(String info) {
         log.info("--------------mq收到了信息, 进行清除缓存的操作----------------");

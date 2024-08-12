@@ -54,24 +54,24 @@ public class VoteServiceImpl extends ServiceImpl<VoteMapper, Vote> implements Vo
 
     @Override
     public boolean addVotes(String username, Long voteId) {
-//        //获取对象
-//        Object userobj = redisService.get("user_" + username);
-//        if (userobj instanceof User && userobj!=null) {
-//            user=(User) userobj;
-//        }
-//        Object voteObj = redisService.get("singger" + voteId);
-//        if (voteObj instanceof Vote && voteObj != null) {
-//            vote = (Vote) voteObj;
-//        }
+        //获取对象
+        Object userobj = redisService.get("user_" + username);
+        if (userobj instanceof User && userobj!=null) {
+            user=(User) userobj;
+        }
+        Object voteObj = redisService.get("singger" + voteId);
+        if (voteObj instanceof Vote && voteObj != null) {
+            vote = (Vote) voteObj;
+        }
         //缓存里没有就读数据库
-//        if (user == null) {
+        if (user == null) {
             QueryWrapper<User> queryWrapper=new QueryWrapper<>();
             queryWrapper.eq("username",username);
             user=userService.getOne(queryWrapper);
-//        }
-//        if (vote == null) {
+        }
+        if (vote == null) {
             vote = getById(voteId);
-//        }
+        }
         //投票开始，用户有票的话可以投,然后保存到数据库，删除缓存
         if (user.getVotes() > 0) {
             user.setVotes(user.getVotes() - 1);
@@ -87,6 +87,7 @@ public class VoteServiceImpl extends ServiceImpl<VoteMapper, Vote> implements Vo
 
     @Override
     public boolean subVotes(String username, Long voteId) {
+
         //获取对象
         Object userObj = redisService.get("user_" + username);
         if (userObj instanceof User && userObj != null) {
